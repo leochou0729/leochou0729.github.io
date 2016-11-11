@@ -4,6 +4,22 @@
 	<meta charset="UTF-8">
 	<link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/hjabjbojlljbnhojbbecfllpgjbhbndi">
 	<title>Demonstrating how to use KIYPlugin</title>
+
+	<style>
+	.button {
+	    background-color: #4CAF50; 
+	    border: none;
+	    color: white;
+	    padding: 10px 24px;
+	    text-align: center;
+	    text-decoration: none;
+	    display: inline-block;
+	    font-size: 16px;
+	    margin: 4px 2px;
+	    cursor: pointer;
+	    border-radius: 8px;
+	}
+	</style>
 </head>
 <body>
 	<script type="text/javascript" src="https://rawgit.com/ricmoo/aes-js/master/index.js"></script>
@@ -163,8 +179,9 @@
 	</script>
     <h2>Preparation</h2>
 	<ol>
-		<li><a href="#" onclick="chrome.webstore.install()">Install Chrome Extension.</a></li>
-		<li><a href="https://dl.dropboxusercontent.com/u/22483933/KIY/plugin/mac/KIYPlugin.pkg" download>Install plugin installer package.</a></li>
+		<li>Install Chrome Extension.</li>
+		<button class="button" onclick="chrome.webstore.install()">Add to Chrome</button>
+		<li><a href="https://dl.dropboxusercontent.com/u/22483933/KIY/plugin/mac/KIYPlugin.pkg" download>Click here</a> to download and install plugin installer package.</li>
 		<li>Do the following tests.</li>
 	</ol>
 	<hr>
