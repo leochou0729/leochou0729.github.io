@@ -1,0 +1,180 @@
+
+<html>
+<head>
+	<meta charset="UTF-8">
+	<link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/hjabjbojlljbnhojbbecfllpgjbhbndi">
+	<title>Demonstrating how to use KIYPlugin</title>
+</head>
+<body>
+	<script type="text/javascript" src="https://rawgit.com/ricmoo/aes-js/master/index.js"></script>
+	<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script src="vex.combined.min.js"></script>
+	<link rel="stylesheet" href="vex.css" />
+	<link rel="stylesheet" href="vex-theme-wireframe.css" />
+	<script>vex.defaultOptions.className = 'vex-theme-wireframe';</script>
+
+	<script>
+
+		var mimetype = "application/x-kiyplugin"
+		var plugin = null;
+		
+		function initPlugin() {
+			//Create a var that basically saves a random number to guarantee an unique identifier for a function. _plugin_ can be any other name.
+			var callbackFn = "_plugin_" + Math.floor(Math.random() * 100000000);
+
+			window[callbackFn] = function (data) {
+				//Retrieve the wyrmhole factory for later creation
+				var helper = data.wyrmhole; 
+
+				setHelper(helper);
+			}
+			/*Post a message to the extension, telling it to instantiate a a wyrmhole.
+			FBDevTeam should be the name of your company inside the plugin configuration. For the echoTestPlugin its FBDevTeam.
+			callbackFn is the function that will be called once the result of the postMessage is returned.
+			*/
+			window.postMessage({firebreath: "FAST", callback: callbackFn}, "*");
+		}
+
+		function setHelper(helper) {
+			//Using the wyrmholeFactory we create a wyrmhole.
+			helper.create(mimetype).then(
+				function (wyrmhole) {
+					//With the created wyrmhole we instantiate a new FireWyrmJS object that will allow us to create the plugin.
+					var FWJS = window.FireWyrmJS;
+					//Create pluginFactory that will allow the plugin creation.
+					window.pluginFactory = new FWJS(wyrmhole); 
+					pluginFactory.create(mimetype, {}).then(
+						function (pluginObj) {
+							//Save the plugin to a gloal var for later access
+							plugin = pluginObj;
+						},
+						function (error) {
+							console.log("An Unexpected Error has ocurred: ", error);
+						}
+					)
+				},
+				function (error) {
+					console.log("An Unexpected Error has ocurred: ", error);
+				}
+			)
+		}
+
+		function getPluginVersion() {
+			if(plugin) {
+				plugin.version.then(
+					function (version) {
+						console.log("Plugin version: ", version);
+					},
+					function (error) {
+						console.log("An Unexpected Error has ocurred: ", error);
+					}
+				)
+			}
+			else {
+				alert("plugin has not been initialized");
+			}
+		}
+
+		function getStatus() {
+			if(plugin) {
+				plugin.ready.then(
+					function (status) {
+						console.log("Is KIY ready to use?: ", status);
+					},
+					function (error) {
+						console.log("An Unexpected Error has ocurred: ", error);
+					}
+				)
+				
+			}
+			else {
+				alert("plugin has not been initialized");
+			}
+		}
+
+		function toHexString(bytes) {
+  			return bytes.map(function(byte) {
+    			return (byte & 0xFF).toString(16)
+    		}).join('')
+		}
+
+		function getSerialNumber() {
+			if(plugin) {
+				plugin.serial.then(
+					function (serial) {
+						console.log("Serial number(hexidecimal): ", toHexString(serial));
+					},
+					function (error) {
+						console.log("An Unexpected Error has ocurred: ", error.message);
+					}
+				)
+				
+			}
+			else {
+				alert("plugin has not been initialized");
+			}
+		}
+
+		function encrypt() {
+			if(plugin) {
+				vex.dialog.open({
+				    message: 'Please enter your PIN:',
+				    input: '<input name="pin" type="password" minlength="6" maxlength="15" required />',
+				    buttons: [$.extend({}, vex.dialog.buttons.YES, {text: 'OK'}), $.extend({}, vex.dialog.buttons.NO, {text: 'Cancel'})],
+				    callback: function (data) {
+				        if (!data) {
+				            console.log('Login cancelled')
+				        } 
+				        else {
+				            plugin.get_enckey(data.pin).then(
+								function (key) {
+
+									console.log("Encryption key: ", toHexString(key));
+
+									var text = '该加密采用AES-256算法，消息可以是任意长度。';
+									var textBytes = aesjs.util.convertStringToBytes(text);
+
+									var aesCtr = new aesjs.ModeOfOperation.ctr(key);
+									var encryptedBytes = aesCtr.encrypt(textBytes);
+
+									var encryptedText = aesjs.util.convertBytesToString(encryptedBytes);
+									console.log("Encrypted text: ", encryptedText);
+
+									var aesCtr = new aesjs.ModeOfOperation.ctr(key);
+									var decryptedBytes = aesCtr.decrypt(encryptedBytes);
+
+									var decryptedText = aesjs.util.convertBytesToString(decryptedBytes);
+									console.log("Decrypted text: ", decryptedText);
+								},
+								function (error) {
+									console.log("An Unexpected Error has ocurred: ", error.message);
+								}
+							)
+				        }
+				    }
+				})
+				
+			}
+			else {
+				alert("plugin has not been initialized");
+			}
+		}
+
+	</script>
+    <h2>Preparation</h2>
+	<ol>
+		<li><a href="#" onclick="chrome.webstore.install()">Install Chrome Extension.</a></li>
+		<li><a href="https://dl.dropboxusercontent.com/u/22483933/KIY/plugin/mac/KIYPlugin.pkg" download>Install plugin installer package.</a></li>
+		<li>Do the following tests.</li>
+	</ol>
+	<hr>
+	
+	<h2>Testing plugin</h2>
+	<a href="#" onclick="initPlugin()">Initialize plugin</a><br>
+	<a href="#" onclick="getPluginVersion()">Get plugin version</a><br>
+	<a href="#" onclick="getStatus()">Check if KIY is already plugged in</a><br>
+	<a href="#" onclick="getSerialNumber()">Get KIY serial number</a><br>
+	<a href="#" onclick="encrypt()">Encrypting a short message</a><br>
+
+</body>
+</html>
