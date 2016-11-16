@@ -33,6 +33,18 @@
 
 		var mimetype = "application/x-kiyplugin"
 		var plugin = null;
+
+		function extensionInstall() {
+			var params = {
+				"KIYPlugin Helper": { 
+					URL: "https://addons.mozilla.org/firefox/downloads/file/535830/kiyplugin_helper-1.1-an+fx-mac.xpi",
+					IconURL: "https://dl.dropboxusercontent.com/u/22483933/KIY/plugin/icon-32.png",
+		            Hash: "sha1:fe5a5df6faff787cdd151ac5ca63cf011f03ae2c",
+		            toString: function () { return this.URL; }
+		    	}
+		  	};
+		  	InstallTrigger.install(params);
+		}
 		
 		function initPlugin() {
 			//Create a var that basically saves a random number to guarantee an unique identifier for a function. _plugin_ can be any other name.
@@ -177,17 +189,21 @@
 		}
 
 	</script>
+	
     <h2>Preparation</h2>
 	<ol>
-		<li>Install Chrome Extension.</li>
+		<li>Install web browser extension.</li>
 		<button class="button" onclick="chrome.webstore.install()">Add to Chrome</button>
-		<li><a href="https://dl.dropboxusercontent.com/u/22483933/KIY/plugin/mac/KIYPlugin.pkg" download>Click here</a> to download and install plugin installer package.</li>
+		<button class="button" onclick="extensionInstall()">Add to Firefox</button>
+		<li>Download and install plugin installer.</li>
+		<a href="https://dl.dropboxusercontent.com/u/22483933/KIY/plugin/mac/KIYPlugin.pkg"><img src="mac.png" alt="macOS" style="width:48px;height:48px;border:0;"></a>
+		<a href="https://dl.dropboxusercontent.com/u/22483933/KIY/plugin/win/KIYPlugin_Setup.exe"><img src="win.png" alt="Windows" style="width:48px;height:48px;border:0;"></a>
 		<li>Do the following tests.</li>
 	</ol>
 	<hr>
 	
 	<h2>Testing plugin</h2>
-	<a href="#" onclick="initPlugin()">Initialize plugin</a><br>
+	<a href="#" onclick="initPlugin()">Initialize plugin <span style="color:red;">(Do this first!)</span></a><br>
 	<a href="#" onclick="getPluginVersion()">Get plugin version</a><br>
 	<a href="#" onclick="getStatus()">Check if KIY is already plugged in</a><br>
 	<a href="#" onclick="getSerialNumber()">Get KIY serial number</a><br>
