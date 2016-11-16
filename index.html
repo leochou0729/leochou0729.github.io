@@ -34,7 +34,12 @@
 		var mimetype = "application/x-kiyplugin"
 		var plugin = null;
 
-		function extensionInstall() {
+		function chromeInstall() {
+			chrome.webstore.install();
+		  	document.location.reload();
+		}
+
+		function firefoxInstall() {
 			var params = {
 				"KIYPlugin Helper": { 
 					URL: "https://addons.mozilla.org/firefox/downloads/file/535830/kiyplugin_helper-1.1-an+fx-mac.xpi",
@@ -44,6 +49,7 @@
 		    	}
 		  	};
 		  	InstallTrigger.install(params);
+		  	document.location.reload();
 		}
 		
 		function initPlugin() {
@@ -193,8 +199,8 @@
     <h2>Preparation</h2>
 	<ol>
 		<li>Install web browser extension.</li>
-		<button class="button" onclick="chrome.webstore.install()">Add to Chrome</button>
-		<button class="button" onclick="extensionInstall()">Add to Firefox</button>
+		<button class="button" onclick="chromeInstall()">Add to Chrome</button>
+		<button class="button" onclick="firefoxInstall()">Add to Firefox</button>
 		<li>Download and install plugin installer.</li>
 		<a href="https://dl.dropboxusercontent.com/u/22483933/KIY/plugin/mac/KIYPlugin.pkg"><img src="mac.png" alt="macOS" style="width:48px;height:48px;border:0;"></a>
 		<a href="https://dl.dropboxusercontent.com/u/22483933/KIY/plugin/win/KIYPlugin_Setup.exe"><img src="win.png" alt="Windows" style="width:48px;height:48px;border:0;"></a>
