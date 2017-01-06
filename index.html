@@ -172,18 +172,17 @@
 									console.log("Encryption key: ", toHexString(key));
 
 									var text = '该加密采用AES-256算法，消息可以是任意长度。';
-									var textBytes = aesjs.util.convertStringToBytes(text);
+									var textBytes = aesjs.util.convertStringToBytes(text, "utf8");
 
 									var aesCtr = new aesjs.ModeOfOperation.ctr(key);
 									var encryptedBytes = aesCtr.encrypt(textBytes);
-
-									var encryptedText = aesjs.util.convertBytesToString(encryptedBytes);
+									var encryptedText = aesjs.util.convertBytesToString(encryptedBytes, "hex");
+									var encryptedBytes2 = aesjs.util.convertStringToBytes(encryptedText, "hex");
 									console.log("Encrypted text: ", encryptedText);
 
 									var aesCtr = new aesjs.ModeOfOperation.ctr(key);
-									var decryptedBytes = aesCtr.decrypt(encryptedBytes);
-
-									var decryptedText = aesjs.util.convertBytesToString(decryptedBytes);
+									var decryptedBytes = aesCtr.decrypt(encryptedBytes2);
+									var decryptedText = aesjs.util.convertBytesToString(decryptedBytes, "utf8");
 									console.log("Decrypted text: ", decryptedText);
 								},
 								function (error) {
