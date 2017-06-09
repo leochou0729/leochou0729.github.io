@@ -6,8 +6,8 @@
 	<title>Demonstrating how to use KIYPlugin</title>
 
 	<link rel="apple-touch-icon" sizes="120x120" href="apple-touch-icon.png">
-	<link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
-	<link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 	<link rel="manifest" href="manifest.json">
 	<link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5">
 	<meta name="theme-color" content="#ffffff">
@@ -29,7 +29,7 @@
 	</style>
 </head>
 <body>
-	<script type="text/javascript" src="https://rawgit.com/ricmoo/aes-js/master/index.js"></script>
+	<script type="text/javascript" src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="vex.combined.min.js"></script>
 	<link rel="stylesheet" href="vex.css" />
@@ -48,9 +48,9 @@
 		function firefoxInstall() {
 			var params = {
 				"KIYPlugin Helper": { 
-					URL: "https://addons.mozilla.org/firefox/downloads/file/535830/kiyplugin_helper-1.1-an+fx-mac.xpi",
-					IconURL: "https://dl.dropboxusercontent.com/u/22483933/KIY/plugin/icon-32.png",
-		            Hash: "sha1:fe5a5df6faff787cdd151ac5ca63cf011f03ae2c",
+					URL: "https://www.dropbox.com/s/p4kys6on88sko14/kiyplugin_helper-1.2-an%2Bfx-mac.xpi?dl=1",
+					IconURL: "https://dl.dropbox.com/s/5shhqxw001kcvvd/icon-32.png",
+		            Hash: "sha1:d02aea528aff846baacc16c2a2c19a4983537849",
 		            toString: function () { return this.URL; }
 		    	}
 		  	};
@@ -172,17 +172,17 @@
 									console.log("Encryption key: ", toHexString(key));
 
 									var text = '该加密采用AES-256算法，消息可以是任意长度。';
-									var textBytes = aesjs.util.convertStringToBytes(text, "utf8");
+									var textBytes = aesjs.utils.utf8.toBytes(text);
 
 									var aesCtr = new aesjs.ModeOfOperation.ctr(key);
 									var encryptedBytes = aesCtr.encrypt(textBytes);
-									var encryptedText = aesjs.util.convertBytesToString(encryptedBytes, "hex");
-									var encryptedBytes2 = aesjs.util.convertStringToBytes(encryptedText, "hex");
+									var encryptedText = aesjs.utils.hex.fromBytes(encryptedBytes);
+									var encryptedBytes2 = aesjs.utils.hex.toBytes(encryptedText);
 									console.log("Encrypted text: ", encryptedText);
 
 									var aesCtr = new aesjs.ModeOfOperation.ctr(key);
 									var decryptedBytes = aesCtr.decrypt(encryptedBytes2);
-									var decryptedText = aesjs.util.convertBytesToString(decryptedBytes, "utf8");
+									var decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
 									console.log("Decrypted text: ", decryptedText);
 								},
 								function (error) {
@@ -207,8 +207,8 @@
 		<button class="button" onclick="chromeInstall()">Add to Chrome</button>
 		<button class="button" onclick="firefoxInstall()">Add to Firefox</button>
 		<li>Download and install plugin installer.</li>
-		<a href="https://www.dropbox.com/s/vvsz0p6kbcxv1lt/KIYPlugin.pkg?dl=1"><img src="mac.png" alt="macOS" style="width:48px;height:48px;border:0;"></a>
-		<a href="https://www.dropbox.com/s/n4448nbwkqpi37n/KIYPlugin_Setup.exe?dl=1"><img src="win.png" alt="Windows" style="width:48px;height:48px;border:0;"></a>
+		<a href="https://www.dropbox.com/s/mgjo1obxhplaer6/KIYPlugin.pkg?dl=1"><img src="mac.png" alt="macOS" style="width:48px;height:48px;border:0;"></a>
+		<a href="https://www.dropbox.com/s/2j820gvi9rgufkc/KIYPlugin_Setup.exe?dl=1"><img src="win.png" alt="Windows" style="width:48px;height:48px;border:0;"></a>
 		<li>Do the following tests.</li>
 	</ol>
 	<hr>
