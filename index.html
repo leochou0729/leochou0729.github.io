@@ -29,7 +29,8 @@
 	</style>
 </head>
 <body>
-	<script type="text/javascript" src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script>
+	<script src="https://cdn.rawgit.com/ricmoo/aes-js/e27b99df/index.js"></script>
+	<script src="https://kjur.github.io/jsrsasign/jsrsasign-latest-all-min.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="vex.combined.min.js"></script>
 	<link rel="stylesheet" href="vex.css" />
@@ -142,7 +143,7 @@
 			if(plugin) {
 				plugin.serial.then(
 					function (serial) {
-						console.log("Serial number(hexidecimal): ", toHexString(serial));
+						console.log("Serial number(hex): ", toHexString(serial));
 					},
 					function (error) {
 						console.log("An Unexpected Error has ocurred: ", error.message);
@@ -169,7 +170,7 @@
 				            plugin.get_enckey(data.pin).then(
 								function (key) {
 
-									console.log("Encryption key: ", toHexString(key));
+									console.log("Encryption key(hex): ", toHexString(key));
 
 									var text = '该加密采用AES-256算法，消息可以是任意长度。';
 									var textBytes = aesjs.utils.utf8.toBytes(text);
@@ -178,12 +179,91 @@
 									var encryptedBytes = aesCtr.encrypt(textBytes);
 									var encryptedText = aesjs.utils.hex.fromBytes(encryptedBytes);
 									var encryptedBytes2 = aesjs.utils.hex.toBytes(encryptedText);
-									console.log("Encrypted text: ", encryptedText);
+									console.log("Encrypted text(hex): ", encryptedText);
 
 									var aesCtr = new aesjs.ModeOfOperation.ctr(key);
 									var decryptedBytes = aesCtr.decrypt(encryptedBytes2);
 									var decryptedText = aesjs.utils.utf8.fromBytes(decryptedBytes);
-									console.log("Decrypted text: ", decryptedText);
+									console.log("Decrypted text(utf8): ", decryptedText);
+								},
+								function (error) {
+									console.log("An Unexpected Error has ocurred: ", error.message);
+								}
+							)
+				        }
+				    }
+				})
+				
+			}
+			else {
+				alert("plugin has not been initialized");
+			}
+		}
+
+		function genRSA() {
+			if(plugin) {
+				vex.dialog.open({
+				    message: 'Please enter your PIN:',
+				    input: '<input name="pin" type="password" minlength="6" maxlength="15" required />',
+				    buttons: [$.extend({}, vex.dialog.buttons.YES, {text: 'OK'}), $.extend({}, vex.dialog.buttons.NO, {text: 'Cancel'})],
+				    callback: function (data) {
+				        if (!data) {
+				            console.log('Login cancelled')
+				        } 
+				        else {
+				            plugin.gen_rsakey(data.pin).then(
+								function (result) {
+									console.log("RSA key pair generated!");
+								},
+								function (error) {
+									console.log("An Unexpected Error has ocurred: ", error.message);
+								}
+							)
+				        }
+				    }
+				})
+				
+			}
+			else {
+				alert("plugin has not been initialized");
+			}
+		}
+
+		function verify() {
+			if(plugin) {
+				vex.dialog.open({
+				    message: 'Please enter your PIN:',
+				    input: '<input name="pin" type="password" minlength="6" maxlength="15" required />',
+				    buttons: [$.extend({}, vex.dialog.buttons.YES, {text: 'OK'}), $.extend({}, vex.dialog.buttons.NO, {text: 'Cancel'})],
+				    callback: function (data) {
+				        if (!data) {
+				            console.log('Login cancelled')
+				        } 
+				        else {
+				        	var message = '该签名采用SHA1-RSA1024算法。';
+
+				            plugin.sign(data.pin, message).then(
+								function (signature) {
+									var sig_string = toHexString(signature);
+									console.log("Signature(hex): ", sig_string);
+
+									plugin.get_pubkey().then(
+										function (key) {
+											var e_string = toHexString(key.slice(3, 7).reverse());
+											var n_string = toHexString(key.slice(9, 137).reverse());
+											console.log("RSA public key E(hex): ", e_string);
+											console.log("RSA public key N(hex): ", n_string);
+
+											var sig = new KJUR.crypto.Signature({"alg": "SHA1withRSA"});
+											sig.init(KEYUTIL.getKey({n: n_string, e: e_string}));
+											sig.updateString(message);
+											var isValid = sig.verify(sig_string);
+											console.log("Is signature valid?: ", isValid);
+										},
+										function (error) {
+											console.log("An Unexpected Error has ocurred: ", error.message);
+										}
+									)		
 								},
 								function (error) {
 									console.log("An Unexpected Error has ocurred: ", error.message);
@@ -207,8 +287,8 @@
 		<button class="button" onclick="chromeInstall()">Add to Chrome</button>
 		<button class="button" onclick="firefoxInstall()">Add to Firefox</button>
 		<li>Download and install plugin installer.</li>
-		<a href="https://www.dropbox.com/s/mgjo1obxhplaer6/KIYPlugin.pkg?dl=1"><img src="mac.png" alt="macOS" style="width:48px;height:48px;border:0;"></a>
-		<a href="https://www.dropbox.com/s/2j820gvi9rgufkc/KIYPlugin_Setup.exe?dl=1"><img src="win.png" alt="Windows" style="width:48px;height:48px;border:0;"></a>
+		<a href="https://www.dropbox.com/s/44nunq8035x9k1f/KIYPlugin.pkg?dl=1"><img src="mac.png" alt="macOS" style="width:48px;height:48px;border:0;"></a>
+		<a href="https://www.dropbox.com/s/gbb2fmgbnl30z3o/KIYPlugin_Setup.exe?dl=1"><img src="win.png" alt="Windows" style="width:48px;height:48px;border:0;"></a>
 		<li>Do the following tests.</li>
 	</ol>
 	<hr>
@@ -218,7 +298,9 @@
 	<a href="#" onclick="getPluginVersion()">Get plugin version</a><br>
 	<a href="#" onclick="getStatus()">Check if KIY is already plugged in</a><br>
 	<a href="#" onclick="getSerialNumber()">Get KIY serial number</a><br>
-	<a href="#" onclick="encrypt()">Encrypting a short message</a><br>
+	<a href="#" onclick="encrypt()">Encrypt a short message</a><br>
+	<a href="#" onclick="genRSA()">Generate RSA key pair</a><br>
+	<a href="#" onclick="verify()">Verify RSA signature</a><br>
 
 </body>
 </html>
